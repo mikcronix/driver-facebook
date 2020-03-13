@@ -349,9 +349,10 @@ class FacebookDriver extends HttpDriver implements VerifiesService
      * @param string|Question|IncomingMessage $message
      * @param IncomingMessage $matchingMessage
      * @param array $additionalParameters
+     * @param null|string $messageType
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
+    public function buildServicePayload($message, $matchingMessage, $additionalParameters = [], $messageType = null)
     {
         if ($this->driverEvent) {
             $payload = $this->driverEvent->getPayload();
@@ -363,8 +364,11 @@ class FacebookDriver extends HttpDriver implements VerifiesService
         } else {
             $recipient = ['id' => $matchingMessage->getSender()];
         }
+        if ($messageType === null) {
+            $messageType = self::TYPE_RESPONSE;
+        }
         $parameters = array_merge_recursive([
-            'messaging_type' => self::TYPE_RESPONSE,
+            'messaging_type' => $messageType,
             'recipient' => $recipient,
             'message' => [
                 'text' => $message,
